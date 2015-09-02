@@ -81,16 +81,16 @@ def main():
         summary = True
         del args[0]
 
-        for file in args:
-            names = extract_names(file)
-            output = '\n'.join(names)
+    for file in args:
+        names = extract_names(file)
+        output = '\n'.join(names)
 
-            if summary:
-                outf = open(file + '.summary', 'w')
-                outf.write(output + '\n')
-                outf.close()
-            else:
-                print output
+        if summary:
+            outf = open(file + '.summary', 'w')
+            outf.write(output + '\n')
+            outf.close()
+        else:
+            print output
 
 
 if __name__ == '__main__':
