@@ -63,14 +63,14 @@ def print_words(filename):
     word_count = count_words(filename)
     words = sorted(word_count)
     for word in words:
-        print(word, word_count[word])
+        print('{} {}'.format(word, word_count[word]))
 
 
 def print_top(filename):
     word_count = count_words(filename)
     words = sorted(word_count, key=word_count.get, reverse=True)[:20]
     for word in words:
-        print(word, word_count[word])
+        print('{} {}'.format(word, word_count[word]))
 ###
 
 # This basic command line argument parsing code is provided and
