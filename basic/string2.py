@@ -50,17 +50,18 @@ def not_bad(s):
 # Given 2 strings, a and b, return a string of the form
 #  a-front + b-front + a-back + b-back
 def front_back(a, b):
-    if len(a) % 2:
-        ahalf = len(a) // 2 + 1
-    else:
-        ahalf = len(a) // 2
+    def divide(s):
+        if len(s) % 2:
+            half = len(s) // 2 + 1
+        else:
+            half = len(s) // 2
+        front = s[:half]
+        back = s[half:]
+        return front, back
 
-    if len(b) % 2:
-        bhalf = len(b) // 2 + 1
-    else:
-        bhalf = len(b) // 2
-
-    return a[:ahalf] + b[:bhalf] + a[ahalf:] + b[bhalf:]
+    afront, aback = divide(a)
+    bfront, bback = divide(b)
+    return afront + bfront + aback + bback
 
 
 # Simple provided test() function used in main() to print
