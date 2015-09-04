@@ -51,12 +51,11 @@ def mimic_dict(filename):
     with open(filename, 'r') as f:
         data = f.read()
         f.close()
-        last_word = ''
+        previous = ''
         for word in data.split():
-            mdict[last_word].append(word)
-            if not word in mdict:
-                mdict[word] = []
-            last_word = word
+            mdict.setdefault(word, [])
+            mdict[previous].append(word)
+            previous = word
 
     return mdict
 

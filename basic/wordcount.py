@@ -63,21 +63,21 @@ def print_words(filename):
     word_count = count_words(filename)
     words = sorted(word_count)
     for word in words:
-        print word, word_count[word]
+        print(word, word_count[word])
 
 
 def print_top(filename):
     word_count = count_words(filename)
     words = sorted(word_count, key=word_count.get, reverse=True)[:20]
     for word in words:
-        print word, word_count[word]
+        print(word, word_count[word])
 ###
 
 # This basic command line argument parsing code is provided and
 # calls the print_words() and print_top() functions which you must define.
 def main():
     if len(sys.argv) != 3:
-        print 'usage: ./wordcount.py {--count | --topcount} file'
+        print('usage: ./wordcount.py {--count | --topcount} file')
         sys.exit(1)
 
     option = sys.argv[1]
@@ -87,7 +87,7 @@ def main():
     elif option == '--topcount':
         print_top(filename)
     else:
-        print 'unknown option: ' + option
+        print('unknown option: ' + option)
         sys.exit(1)
 
 
