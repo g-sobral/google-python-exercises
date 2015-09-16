@@ -2,9 +2,11 @@
 import argparse
 from collections import Counter
 import tkinter as tk
+from tkinter import filedialog
 
-def load(f):
-    return f.read()
+def load(filename):
+    with open(filename, 'r') as f:
+        return f.read()
 
 def count(content):
     return Counter(content.lower().split())
@@ -32,7 +34,7 @@ def cli():
 
     parser.add_argument('-c', '--count', action='store_true')
     parser.add_argument('-t', '--topcount', type=int)
-    parser.add_argument('textfile', type=argparse.FileType())
+    parser.add_argument('textfile')
 
     options = parser.parse_args()
 
@@ -46,21 +48,35 @@ def gui():
     class Application(tk.Frame):
         def __init__(self, master=None):
             tk.Frame.__init__(self, master)
+
             self.pack()
             self.createWidgets()
 
         def createWidgets(self):
-            self.hi_there = tk.Button(self)
-            self.hi_there["text"] = "Hello World\n(click me)"
-            self.hi_there["command"] = self.say_hi
-            self.hi_there.pack(side="top")
 
-            self.QUIT = tk.Button(self, text="QUIT", fg="red",
-                                                command=root.destroy)
-            self.QUIT.pack(side="bottom")
+            self.file_opt = {}
+            self.file_opt['defaultextension'] = '.txt'
+            self.file_opt['filetypes'] = [('all files', '.*'), ('text files', '.txt')]
+            self.file_opt['initialdir'] = '.'
+            self.file_opt['initialfile'] = 'alice.txt'
+            self.file_opt['parent'] = root
 
-        def say_hi(self):
-            print("hi there, everyone!")
+            self.select_file = tk.Button(self, text='Select text file', command=self.getFilename).pack(side='top')
+
+            self.count = tk.Button(self, text='Count', command=self.c_words).pack(side='top')
+            self.tcount = tk.Button(self, text='Top Count', command=self.t_words).pack(side='top')
+
+            self.QUIT = tk.Button(self, text="QUIT", fg="red", command=root.destroy).pack(side="bottom")
+
+        def c_words(self):
+            print(count_words(self.filename))
+
+        def t_words(self):
+            print(top_count(self.filename))
+
+        def getFilename(self):
+            self.filename = filedialog.askopenfilename(**self.file_opt)
+            print(self.filename)
 
     root = tk.Tk()
     app = Application(master=root)
