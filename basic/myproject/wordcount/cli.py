@@ -12,4 +12,4 @@ def cli():
     if options.count:
         print(count_words(options.textfile))
     elif options.topcount:
-        print(top_count(options.textfile))
+        print(top_count(options.textfile, options.topcount))

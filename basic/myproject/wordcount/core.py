@@ -20,5 +20,6 @@ def lines(words):
 def count_words(filename):
     return lines(asc(count(load(filename))))
 
-def top_count(filename):
-    return lines(top(count(load(filename))))
+def top_count(filename, qty):
+    print('topcount')
+    return lines(top(count(load(filename)), qty))
