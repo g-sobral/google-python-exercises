@@ -31,10 +31,7 @@ class Vector:
         return sqrt(pow(self.x, 2) + pow(self.y, 2))
 
     def __bool__(self):
-        if self.x != 0 or self.y != 0:
-            return True
-        else:
-            return False
+        return not self.x == self.y == 0
 
     def dot(self, other):
         return self.x * other.x + self.y * other.y

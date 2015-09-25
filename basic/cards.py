@@ -5,18 +5,16 @@ class Card:
         self.rank = rank
         self.suit = suit
 
-
     def __eq__(self, other):
         return (self.rank, self.suit) == (other.rank, other.suit)
 
 
 class Deck(list):
-    suits = ('spades', 'diamonds', 'clubs', 'hearts')
-    ranks = ('2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A')
-
     def __init__(self):
-        for s in self.suits:
-            for r in self.ranks:
+        suits = ('spades', 'diamonds', 'clubs', 'hearts')
+        ranks = ('2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A')
+        for s in suits:
+            for r in ranks:
                 self.append(Card(rank=r, suit=s))
 
 

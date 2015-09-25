@@ -6,10 +6,12 @@
 # Google's Python Class
 # http://code.google.com/edu/languages/google-python-class/
 
-import os
+from pathlib import Path
 import re
-import sys
-import urllib
+import argparse
+from urllib.request import urlretrieve
+from urllib.parse import urljoin
+from concurrent.futures import ThreadPoolExecutor
 
 """Logpuzzle exercise
 Given an apache logfile, find the puzzle urls and download the images.
@@ -19,29 +21,21 @@ Here's what a puzzle url looks like:
 """
 
 
-def read_urls(filename):
+def read_urls(logfile):
     """Returns a list of the puzzle urls from the given log file,
     extracting the hostname from the filename itself.
     Screens out duplicate urls and returns the urls sorted into
     increasing order."""
-    match_server = re.search(r'(?<=_)\S+', filename)
-    server = match_server.group(0)
+    match_server = re.search(r'(?<=_)\S+', str(logfile))
+    server = 'https://' + match_server.group(0)
 
-    with open(filename, 'r') as f:
-        log = f.read()
-        f.close()
+    log = logfile.open('r').read()
 
-    paths = re.findall(r'(?<=GET )\S+', log)
+    paths = set(re.findall(r'(?<=GET )\S+', log))
     puzzle_paths = [p for p in paths if 'puzzle' in p]
-
-    urls = []
-    for p in puzzle_paths:
-        url = ''.join(('http://', server, p))
-        if not url in urls:
-            urls.append(url)
+    urls = [urljoin(server, p) for p in puzzle_paths]
 
     return sorted(urls, key= lambda x: x[x.rfind('-') + 1:])
-
 
 
 def download_images(img_urls, dest_dir):
@@ -52,48 +46,36 @@ def download_images(img_urls, dest_dir):
     with an img tag to show each local image file.
     Creates the directory if necessary.
     """
-    if not os.path.exists(dest_dir):
-        os.makedirs(dest_dir)
-
-    dest_dir = os.path.abspath(dest_dir)
-
+    htmlfile = dest_dir / 'index.html'
     html = '<verbatim>\n<html>\n<body>\n'
 
-    img_idx = 0
-    for url in img_urls:
-        print(url)
-        filename = ''.join((dest_dir, '/img', str(img_idx), '.jpg'))
-        html = ''.join((html, '<img src=\"', filename, '\">'))
-        urllib.urlretrieve(url, filename=filename)
-        img_idx += 1
-
+    images = {}
+    for idx, url in enumerate(img_urls):
+        filepath = dest_dir / ''.join(('img', str(idx), '.jpg'))
+        html = ''.join((html, '<img src=\"', str(filepath), '\">'))
+        images[url] = str(filepath)
     html += '</body>\n</html>'
+    htmlfile.open('w').write(html)
 
-    with open(''.join((dest_dir, '/index.html')), 'w') as htmlfile:
-        htmlfile.write(html)
-        htmlfile.close()
-
+    print('downloading images...')
+    with ThreadPoolExecutor(max_workers=50) as executor:
+        for url, filename in images.items():
+            executor.submit(urlretrieve, url, filename)
+    print('done!')
 
 def main():
-    args = sys.argv[1:]
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-t', '--todir', type=str, help='download images to directory')
+    parser.add_argument('logfile', type=str, help='apache log file with hidden urls')
+    options = parser.parse_args()
 
-    if not args:
-        print()
-        'usage: [--todir dir] logfile '
-        sys.exit(1)
+    img_urls = read_urls(Path(options.logfile))
 
-    todir = ''
-    if args[0] == '--todir':
-        todir = args[1]
-        del args[0:2]
-
-    img_urls = read_urls(args[0])
-
-    if todir:
-        download_images(img_urls, todir)
+    if options.todir:
+        destdir = Path(options.todir).resolve()
+        download_images(img_urls, destdir)
     else:
-        print
-        '\n'.join(img_urls)
+        print('\n'.join(img_urls))
 
 
 if __name__ == '__main__':
